@@ -370,11 +370,22 @@ class WarningGenerator {
     return `<mark class="user-input">${this.escapeHtml(value)}</mark>`;
   }
 
+  // 학생명은 개인정보 보호를 위해 가운데 한 글자를 *로 가린다. 마스터명은 그대로 노출한다.
+  maskMiddleChar(name) {
+    if (!name) return name;
+    const chars = Array.from(name);
+    if (chars.length <= 1) return name;
+
+    const midIndex = chars.length === 2 ? 1 : Math.floor(chars.length / 2);
+    chars[midIndex] = "*";
+    return chars.join("");
+  }
+
   replaceVariables(text) {
     let result = text;
 
     result = result.replace(/\{masterName\}/g, this.mark(this.state.masterName || "마스터님"));
-    result = result.replace(/\{studentName\}/g, this.mark(this.state.studentName || "학생"));
+    result = result.replace(/\{studentName\}/g, this.mark(this.maskMiddleChar(this.state.studentName) || "학생"));
     result = result.replace(/\{count\}/g, this.mark(this.state.violationCount || "O"));
     result = result.replace(/\{recoveredPoints\}/g, this.mark(this.state.recoveredPoints || "O"));
     result = result.replace(/\{illegalPoints\}/g, this.mark(this.state.illegalPoints || "O"));
